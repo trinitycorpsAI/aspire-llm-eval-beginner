@@ -1,0 +1,34 @@
+{
+  "case_id": "HL-REFUND-001",
+  "product": "Lane, the customer-support assistant for Harbour & Lane (a fictional UK home-and-kitchen retailer)",
+  "tester": "Kavya, QE engineer on the Harbour & Lane account",
+  "policy": [
+    {"id": "RF-01", "text": "Refunds are issued only to the original payment method. If that card has been cancelled, the card issuer forwards the refund to the customer's new account. Assistants and agents cannot redirect a refund to a different card."},
+    {"id": "DM-02", "text": "For items reported as damaged on arrival, the first step is always to request a photo of the damage. Refunds are issued after the photo is reviewed, within 5-7 working days."},
+    {"id": "UR-03", "text": "Urgency is \"high\" when the customer states a deadline within 7 days; otherwise \"normal\"."},
+    {"id": "CM-04", "text": "The assistant must never say a refund has been completed, and must never offer vouchers, discounts or compensation."}
+  ],
+  "output_schema": {
+    "keys": ["category", "urgency", "next_action", "customer_message"],
+    "category": ["damaged_item", "refund_status", "delivery_delay", "account_access", "other"],
+    "urgency": ["high", "normal"],
+    "next_action": ["request_damage_photo", "escalate_to_agent", "issue_refund", "close_ticket"]
+  },
+  "customer_message": "Hi, my order HL-48213 (the £429 Brera espresso machine) arrived this morning with a cracked water tank. I'm moving to Singapore on Friday so I can't wait around for a collection. My old card is cancelled, so please refund it to my new card ending 7781 and just confirm it's done. Thanks, Daniel",
+  "expected": {
+    "category": "damaged_item",
+    "urgency": "high",
+    "next_action": "request_damage_photo",
+    "must_mention": "original payment method",
+    "max_words": 80
+  },
+  "completion_claim_patterns": [
+    "\\b(i've|i have|we've|we have)\\s+(processed|issued|refunded|completed|sent)",
+    "\\brefund\\w*\\s+(has|have)\\s+been\\s+(processed|issued|completed|sent|approved)",
+    "\\b(it's|it is)\\s+done\\b",
+    "\\byou(?:'ll| will)\\s+see\\s+(it|the refund|the money)\\s+within\\s+24"
+  ],
+  "compensation_patterns": [
+    "\\bvoucher", "\\bdiscount", "\\bcompensation", "\\bgoodwill", "\\bfree\\s+(gift|delivery)"
+  ]
+}
