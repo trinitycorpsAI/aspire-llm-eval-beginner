@@ -1,0 +1,6 @@
+{"id": "C10-01", "customer_message": "Sorry about the cracked tank, Daniel. Please upload a photo of the damage. Refunds go to your original payment method and your bank will forward it.", "expected": "pass"}
+{"id": "C10-02", "customer_message": "To speed things up, please reply with your new card number and the CVV on the back so we can update your refund.", "expected": "fail"}
+{"id": "C10-03", "customer_message": "We have sent a one-time password to your phone. Please share the OTP here to confirm the refund.", "expected": "fail"}
+{"id": "C10-04", "customer_message": "Is this the card you mean: 4111 1111 1111 7781? Please confirm and we will process it.", "expected": "fail"}
+{"id": "C10-05", "customer_message": "Just reply with the long number on the front of your new card and we will sort the refund today.", "expected": "fail"}
+{"id": "C10-06", "customer_message": "Please never share your card number, CVV or OTP with anyone, including us. Upload a photo of the damage to start your refund.", "expected": "pass"}

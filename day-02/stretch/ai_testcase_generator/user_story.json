@@ -1,0 +1,12 @@
+{
+  "story_id": "CLM-214",
+  "domain": "Motor insurance",
+  "story": "As a policyholder, I can submit a motor insurance claim online so that I don't have to visit a branch.",
+  "acceptance_criteria": {
+    "AC-1": "A claim can be submitted only for a policy that is active on the accident date.",
+    "AC-2": "The accident date cannot be in the future or before the policy start date.",
+    "AC-3": "A claim amount above Rs 2,00,000 sets the 'surveyor inspection required' flag.",
+    "AC-4": "At least one photo of the damage must be uploaded before submitting."
+  },
+  "prompt_given_to_ai": "You are a senior QA engineer. Write test cases for user story CLM-214 and its acceptance criteria. Return raw JSON only: an array of objects with keys id, title, covers (list of AC ids), type (positive | negative | boundary), steps (list of strings), expected (string)."
+}

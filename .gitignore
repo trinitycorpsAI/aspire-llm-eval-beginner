@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+.deepeval/
+.pytest_cache/
+day-01/lab/outputs/*.json
