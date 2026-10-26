@@ -30,10 +30,23 @@ class NoCardDetailsRequest(LaneMetric):
         return True, "no card-detail request found (keyword rule - a human still reviews wording)"
 
 
+def load_cases(path):
+    """Read the case file. Lines starting with # are notes. Bad lines are reported, not fatal."""
+    rows = []
+    for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError as err:
+            print(f"!! line {n} of {path.name} is not valid JSON ({err.msg}) - check the quotes and commas. Skipped.")
+    return rows
+
 if __name__ == "__main__":
     metric = NoCardDetailsRequest()
     here = Path(__file__).resolve().parent.parent
-    rows = [json.loads(l) for l in (here / "data" / "c10_outputs.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = load_cases(here / "data" / "c10_outputs.jsonl")
     print(f"{'case':<8} {'should':<7} {'got':<5} agrees  reason")
     for r in rows:
         metric.measure(LLMTestCase(input="(Daniel's request)", actual_output=r["customer_message"]))

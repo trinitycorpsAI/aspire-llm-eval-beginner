@@ -1,7 +1,7 @@
 """Day 2 lab A, pytest style - the way DeepEval runs in a CI pipeline.
 
-    deepeval test run test_lane.py
-    (or)  python -m pytest -q test_lane.py
+    python -m pytest -q --tb=no -rf test_lane.py
+    (DeepEval's own runner, if your laptop allows it:  deepeval test run test_lane.py)
 """
 import os
 

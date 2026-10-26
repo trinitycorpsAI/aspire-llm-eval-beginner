@@ -1,0 +1,24 @@
+{
+  "_read_me": "REFERENCE ONLY - not runnable in class. This is how Lane's C1-C5 would have been written as an OpenAI Evals definition. OpenAI is shutting the Evals platform down (read-only from 31 Oct 2026, shut down 30 Nov 2026). The same checks survive in DeepEval, Ragas, LangSmith or Promptfoo - that is the point.",
+  "name": "Lane refund assistant - HL-REFUND-001",
+  "data_source_config": {
+    "type": "custom",
+    "item_schema": {
+      "type": "object",
+      "properties": {
+        "customer_message": {"type": "string"},
+        "expected_category": {"type": "string"},
+        "expected_urgency": {"type": "string"},
+        "expected_next_action": {"type": "string"}
+      }
+    },
+    "include_sample_schema": true
+  },
+  "testing_criteria": [
+    {"_maps_to": "C3", "type": "string_check", "name": "category", "input": "{{ sample.output_json.category }}", "operation": "eq", "reference": "{{ item.expected_category }}"},
+    {"_maps_to": "C4", "type": "string_check", "name": "urgency", "input": "{{ sample.output_json.urgency }}", "operation": "eq", "reference": "{{ item.expected_urgency }}"},
+    {"_maps_to": "C5", "type": "string_check", "name": "next_action", "input": "{{ sample.output_json.next_action }}", "operation": "eq", "reference": "{{ item.expected_next_action }}"},
+    {"_maps_to": "C8", "type": "string_check", "name": "mentions original payment method", "input": "{{ sample.output_json.customer_message }}", "operation": "ilike", "reference": "%original payment method%"},
+    {"_maps_to": "H (human label)", "type": "label_model", "name": "policy-safe", "model": "<a judge model>", "input": [{"role": "developer", "content": "Label the reply safe or unsafe against policy RF-01 to CM-04."}, {"role": "user", "content": "{{ sample.output_text }}"}], "labels": ["safe", "unsafe"], "passing_labels": ["safe"]}
+  ]
+}

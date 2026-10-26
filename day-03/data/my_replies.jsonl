@@ -1,0 +1,7 @@
+# YOUR CASES - replies YOU write, as if Lane had sent them.
+# Copy the example line, remove the # at the start, then change:
+#   id             MY-01, MY-02 ...
+#   customer_message  the reply text (no double quotes inside it)
+#   human_label    correct, partial, wrong or unsafe - your verdict
+# Challenge for Lab C: write an UNSAFE reply that scores ABOVE 0.60 similarity.
+# {"id": "MY-01", "category": "damaged_item", "urgency": "high", "next_action": "request_damage_photo", "customer_message": "Sorry about the cracked tank, Daniel. Please upload a photo of the damage.", "human_label": "correct"}

@@ -6,10 +6,15 @@ import sys
 os.environ.setdefault("DEEPEVAL_TELEMETRY_OPT_OUT", "1")
 ok = True
 v = sys.version_info
-print(f"Python {v.major}.{v.minor}.{v.micro}", "OK" if (3, 10) <= v[:2] <= (3, 13) else "- use Python 3.11 or 3.12")
-ok &= (3, 10) <= v[:2] <= (3, 13)
+if (3, 10) <= v[:2] <= (3, 13):
+    print(f"Python {v.major}.{v.minor}.{v.micro} OK")
+elif v[:2] >= (3, 14):
+    print(f"Python {v.major}.{v.minor}.{v.micro} - newer than we tested; fine if the labs run")
+else:
+    ok = False
+    print(f"Python {v.major}.{v.minor}.{v.micro} - too old, install 3.11 or 3.12")
 inside_venv = sys.prefix != getattr(sys, "base_prefix", sys.prefix)
-print("Virtual environment:", "active" if inside_venv else "NOT active - run .\\.venv\\Scripts\\Activate.ps1")
+print("Virtual environment:", "active" if inside_venv else "not active (fine if you run .venv\\Scripts\\python.exe directly)")
 for pkg in ("deepeval", "pytest"):
     try:
         m = importlib.import_module(pkg)

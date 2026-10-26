@@ -10,7 +10,7 @@ whether it is safe to release. Every day adds one more kind of evidence.
 |---|---|---|
 | 1 | GenAI & LLM foundations for QA | `day-01` |
 | 2 | The eval lifecycle, setup, DeepEval | `day-02` |
-| 3 | Ragas, OpenAI Evals, LangSmith, framework anatomy | coming |
+| 3 | Ragas, OpenAI Evals, LangSmith, framework anatomy | `day-03` |
 | 4 | Relevancy & faithfulness | coming |
 | 5 | Hallucination, toxicity, bias, PII | coming |
 | 6 | LLM-as-a-judge, G-Eval | coming |
@@ -18,6 +18,10 @@ whether it is safe to release. Every day adds one more kind of evidence.
 | 8 | Evaluating RAG outputs | coming |
 | 9 | Prompt injection, bias, EU AI Act, India AI guidance | coming |
 | 10 | Capstone | coming |
+
+## Day 3
+
+- `day-03/` - Ragas and LangSmith on the same Lane replies. Start with `day-03/README.md`.
 
 ## Day 2
 

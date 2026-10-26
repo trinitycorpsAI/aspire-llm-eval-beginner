@@ -87,9 +87,27 @@ def t7(tc):
     return ok, "has negative and boundary tests" if ok else f"types present: {sorted(kinds)}"
 
 
+# ---------------------------------------------------------------------------
+# YOUR TURN - T8
+# Run C's TC-01 "covers" AC-2 but only tries a VALID date. T4 trusted the label.
+# Rule: every acceptance criterion needs at least one negative OR boundary test.
+# Fill in the two TODO lines, save, rerun. Kavya's version: solution_t8.py
+# ---------------------------------------------------------------------------
+def t8(tc):
+    tested_hard = set()
+    for c in cases(tc):
+        # TODO 1: if c["type"] is "negative" or "boundary",
+        #         add every AC in c["covers"] to tested_hard   (hint: tested_hard.update(...))
+        pass
+    # TODO 2: missing = the ACs in VALID_ACS that are not in tested_hard
+    missing = []
+    return not missing, "every AC has a negative/boundary test" if not missing else f"only happy-path tests for {missing}"
+
+
 METRICS = [T("T1", "Raw JSON array", t1), T("T2", "6 keys per case", t2), T("T3", "Unique IDs", t3),
            T("T4", "Every AC covered", t4), T("T5", "No invented requirements", t5),
-           T("T6", "Specific expected results", t6), T("T7", "Negative + boundary tests", t7)]
+           T("T6", "Specific expected results", t6), T("T7", "Negative + boundary tests", t7),
+           T("T8", "Every AC tested the hard way", t8)]
 
 if __name__ == "__main__":
     print(f"Story {STORY['story_id']}: {STORY['story']}\n")
