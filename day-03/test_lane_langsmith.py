@@ -30,7 +30,7 @@ def test_lane_contract(row):
     tc = LLMTestCase(input=CASE["customer_message"], actual_output=row["raw"])
     metrics = day1_contract()
     # YOUR TURN: remove the # on the next line to add the C10 you wrote on Day 2
-    # metrics.append(NoCardDetailsRequest())
+    metrics.append(NoCardDetailsRequest())
     failed = []
     for metric in metrics:
         metric.measure(tc)

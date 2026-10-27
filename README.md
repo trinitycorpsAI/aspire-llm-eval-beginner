@@ -11,13 +11,17 @@ whether it is safe to release. Every day adds one more kind of evidence.
 | 1 | GenAI & LLM foundations for QA | `day-01` |
 | 2 | The eval lifecycle, setup, DeepEval | `day-02` |
 | 3 | Ragas, OpenAI Evals, LangSmith, framework anatomy | `day-03` |
-| 4 | Relevancy & faithfulness | coming |
+| 4 | Relevancy & faithfulness | `day-04` |
 | 5 | Hallucination, toxicity, bias, PII | coming |
 | 6 | LLM-as-a-judge, G-Eval | coming |
 | 7 | Building eval datasets | coming |
 | 8 | Evaluating RAG outputs | coming |
 | 9 | Prompt injection, bias, EU AI Act, India AI guidance | coming |
 | 10 | Capstone | coming |
+
+## Day 4
+
+- `day-04/` - the Eval Kit: test an AI assistant yourself (relevancy, faithfulness, your own cases). Start with `day-04/README.md`. Needs an API key in `day-04/.env`.
 
 ## Day 3
 

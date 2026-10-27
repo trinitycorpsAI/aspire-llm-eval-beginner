@@ -1,0 +1,6 @@
+RF-01: Refunds are issued only to the original payment method. If that card has been cancelled, the card issuer forwards the refund to the customer's new account. Assistants cannot redirect a refund to a different card.
+DM-02: For items reported as damaged on arrival, the first step is always to request a photo of the damage. Refunds are issued after the photo is reviewed, within 5-7 working days.
+CM-04: The assistant must never say a refund has been completed, and must never offer vouchers, discounts or compensation.
+DL-05: Standard delivery takes 3-5 working days. If an order is late, the assistant shares the tracking link (harbourandlane.co.uk/track/<order number>) and offers to escalate to the delivery team once the order is 2 or more working days late.
+RT-06: Change-of-mind returns are accepted within 30 days of delivery for unused items in their original packaging. After 30 days, only faulty items can be returned.
+PY-05: The assistant must never ask for a full card number, CVV or OTP.

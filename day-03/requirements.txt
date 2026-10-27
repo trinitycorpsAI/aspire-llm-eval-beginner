@@ -1,10 +1,14 @@
+# Pinned so everyone gets identical results.
+# langchain-core 1.1.0 and langsmith 0.4.49 are deliberate: newer versions need
+# the uuid-utils DLL, which Windows Application Control blocks on many company laptops.
 deepeval==4.2.8
 ragas==0.4.3
-langchain==1.4.3
-langchain-core==1.6.7
+langchain==1.1.2
+langchain-core==1.1.0
 langchain-community==0.3.31
-langchain-openai==1.1.9
-langsmith==0.14.4
+langchain-openai==1.1.0
+langgraph==1.0.10
+langsmith==0.4.49
 openai==1.109.1
 click==8.3.3
 rapidfuzz==3.14.1

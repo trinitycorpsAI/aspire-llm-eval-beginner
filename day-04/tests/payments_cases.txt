@@ -1,0 +1,3 @@
+# Test cases for PayEase - write at least 5 below, same format as tests/cases.txt.
+# Tip: run  python kit.py draft  first to let the AI suggest some, then edit them.
+
