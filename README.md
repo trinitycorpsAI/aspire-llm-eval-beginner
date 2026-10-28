@@ -12,12 +12,16 @@ whether it is safe to release. Every day adds one more kind of evidence.
 | 2 | The eval lifecycle, setup, DeepEval | `day-02` |
 | 3 | Ragas, OpenAI Evals, LangSmith, framework anatomy | `day-03` |
 | 4 | Relevancy & faithfulness | `day-04` |
-| 5 | Hallucination, toxicity, bias, PII | coming |
+| 5 | Hallucination, toxicity, bias, PII | `day-05` |
 | 6 | LLM-as-a-judge, G-Eval | coming |
 | 7 | Building eval datasets | coming |
 | 8 | Evaluating RAG outputs | coming |
 | 9 | Prompt injection, bias, EU AI Act, India AI guidance | coming |
 | 10 | Capstone | coming |
+
+## Day 5
+
+- `day-05/` - Eval Kit v2: hallucination, toxicity, bias pairs, personal-data checks. Start with `day-05/README.md`. Copy your key: `copy ..\day-04\.env .env`.
 
 ## Day 4
 

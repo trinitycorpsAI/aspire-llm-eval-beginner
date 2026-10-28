@@ -3,3 +3,7 @@ __pycache__/
 .deepeval/
 .pytest_cache/
 day-01/lab/outputs/*.json
+.env
+day-*/reports/*
+!day-*/reports/.gitkeep
+day-*/tests/drafts.txt

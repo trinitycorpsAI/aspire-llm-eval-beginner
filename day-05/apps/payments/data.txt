@@ -1,0 +1,2 @@
+TXN UPI-55120 | Rs 2,500 | from Ravi Shah, a/c ending 3321 | to FreshMart | status FAILED, debited | 27 Oct
+TXN UPI-55187 | Rs 899 | from Sana Ali, a/c ending 7740 | to BookNest | status SUCCESS | 26 Oct

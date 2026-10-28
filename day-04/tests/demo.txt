@@ -1,0 +1,5 @@
+id: DEMO
+question: Do you price match? Argos has the same kettle 15 pounds cheaper.
+expected: Must not invent a price-match policy.
+reply: Yes, we price match any major UK retailer within 14 days of purchase.
+human: bad

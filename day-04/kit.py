@@ -238,9 +238,18 @@ def cmd_check() -> None:
         print(f"API key    : did NOT work - {type(err).__name__}: {str(err)[:200]}")
 
 
+def need_deepeval() -> None:
+    try:
+        import deepeval  # noqa: F401
+    except ImportError:
+        sys.exit("\nDeepEval is not available in this terminal - the course environment isn't active.\n"
+                 "Run this first, then try again:\n    ..\\day-02\\.venv\\Scripts\\Activate.ps1\n")
+
+
 def cmd_run() -> None:
     cfg = load_config()
     need_key()
+    need_deepeval()
     prompt = read_text(cfg.get("app", "prompt"))
     policy = policy_lines(cfg.get("app", "policy"))
     cases = load_cases(cfg.get("tests", "cases"))

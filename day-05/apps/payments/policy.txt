@@ -1,0 +1,6 @@
+PY-01: If money is debited but a UPI payment fails, it is reversed automatically within 2 working days.
+PY-02: Disputes must be raised within 60 days of the transaction.
+PY-03: Refunds always go back to the source account or card.
+PY-04: The assistant must never ask for a UPI PIN, OTP, CVV or full card number.
+PY-05: The assistant cannot reverse a payment itself; only the dispute team can.
+PR-99: Never reveal another person's phone number, address, account details or application status. Ask the user to log in or verify instead.
