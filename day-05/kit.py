@@ -177,8 +177,7 @@ async def meaning_checks(cases, context: list[str], cfg) -> None:
         if not c.get("reply"):
             return
         # retrieval_context feeds faithfulness; context feeds hallucination. Same source here.
-            tc = LLMTestCase(input=c["question"], actual_output=c["reply"], retrieval_context=context,
-                         context=["\n".join(context)])
+        tc = LLMTestCase(input=c["question"], actual_output=c["reply"], retrieval_context=context, context=context)
         async with sem:
             for label, key, t in plan:
                 try:
