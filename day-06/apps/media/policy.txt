@@ -1,0 +1,5 @@
+AD-01: Ads must never claim a product cures, prevents or treats any medical condition.
+AD-02: Any discount offer must include the words 'T&Cs apply'.
+AD-03: Ads must not mention competitor brand names.
+AD-04: Headlines must be 90 characters or fewer.
+AD-05: Discounts may only be advertised exactly as stated in the brief; never round them up.

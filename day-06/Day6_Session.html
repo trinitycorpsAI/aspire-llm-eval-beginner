@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Day 6 · LLM-as-a-judge & G-Eval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5F9; --surface:#FFFFFF; --sunk:#E8ECF3; --ink:#17202E; --muted:#5B6578; --line:#D4DAE5;
+  --navy:#13294B; --navy-soft:#DDE5F2; --amber:#E39B2D; --amber-soft:#FBEBD0; --amber-ink:#8A5300;
+  --pass:#2C7A57; --pass-soft:#DCEFE5; --fail:#B5402E; --fail-soft:#F7E0DB; --warn:#9A6A00;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1524; --surface:#162036; --sunk:#1D2A44; --ink:#E6EBF3; --muted:#9AA6BC; --line:#2B3A57;
+    --navy:#9DB7E8; --navy-soft:#22335A; --amber:#F0B04F; --amber-soft:#3A2B12; --amber-ink:#F5C77E;
+    --pass:#5CC394; --pass-soft:#163A2B; --fail:#F08A77; --fail-soft:#3F1F1A; --warn:#E8C060;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1524; --surface:#162036; --sunk:#1D2A44; --ink:#E6EBF3; --muted:#9AA6BC; --line:#2B3A57;
+  --navy:#9DB7E8; --navy-soft:#22335A; --amber:#F0B04F; --amber-soft:#3A2B12; --amber-ink:#F5C77E;
+  --pass:#5CC394; --pass-soft:#163A2B; --fail:#F08A77; --fail-soft:#3F1F1A; --warn:#E8C060;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+a{color:var(--navy)}
+code,.mono{font-family:var(--mono);font-size:.88em}
+
+/* shell */
+.shell{display:grid;grid-template-columns:268px 1fr;min-height:100vh}
+.rail{position:sticky;top:0;height:100vh;overflow:auto;background:var(--navy);color:#E9EEF7;padding:22px 14px 22px 18px;display:flex;flex-direction:column;gap:18px}
+:root[data-theme="dark"] .rail{background:#0A1020}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rail{background:#0A1020}}
+.brand{font:700 15px/1.25 var(--display);letter-spacing:.01em}
+.brand small{display:block;font:400 13px/1.4 var(--body);opacity:.72;margin-top:4px}
+.scenes{list-style:none;margin:0;padding:0;counter-reset:s}
+.scenes li{counter-increment:s}
+.scenes button{all:unset;cursor:pointer;display:grid;grid-template-columns:26px 1fr;gap:6px;width:100%;padding:7px 8px;border-radius:6px;font-size:14px;line-height:1.35;color:#C9D3E6}
+.scenes button::before{content:counter(s);font:500 12px/1.6 var(--mono);opacity:.6}
+.scenes button:hover{background:rgba(255,255,255,.07);color:#fff}
+.scenes button[aria-current="true"]{background:var(--amber);color:#1B1405}
+.scenes button[aria-current="true"]::before{opacity:1}
+.scenes button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+.rail-foot{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.rail-foot button{background:rgba(255,255,255,.1);border:0;color:#E9EEF7;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer}
+
+main{min-width:0}
+.progress{position:sticky;top:0;height:4px;background:var(--sunk);z-index:5}
+.progress span{display:block;height:100%;background:var(--amber);transition:width .3s}
+.stage{max-width:1060px;margin:0 auto;padding:44px 48px 120px}
+.scene{display:none}
+.scene.on{display:block;animation:in .35s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.scene.on{animation:none}.progress span{transition:none}}
+
+.kicker{font:500 14px/1.4 var(--body);color:var(--amber-ink);margin:0 0 6px}
+h1,h2,h3{font-family:var(--display);color:var(--ink);margin:0}
+h1{font-size:clamp(34px,5vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.02em;max-width:16ch}
+h2{font-size:clamp(28px,3.6vw,40px);line-height:1.08;font-weight:700;letter-spacing:-.015em;max-width:24ch;margin-bottom:14px}
+h3{font-size:20px;line-height:1.25;font-weight:700;margin-bottom:6px}
+.lede{font-size:19px;color:var(--muted);max-width:62ch;margin:10px 0 26px}
+p{max-width:68ch;margin:0 0 14px}
+.note{font-size:15px;color:var(--muted)}
+
+.nav{position:fixed;right:24px;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:10}
+.nav button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 18px;cursor:pointer;font-weight:600}
+.nav button.primary{background:var(--navy);color:var(--paper);border-color:var(--navy)}
+:root[data-theme="dark"] .nav button.primary{color:#0E1524}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nav button.primary{color:#0E1524}}
+
+/* generic blocks */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.panel.sunk{background:var(--sunk);border-color:transparent}
+.takeaway{border-left:5px solid var(--amber);background:var(--amber-soft);padding:14px 18px;border-radius:0 8px 8px 0;margin:22px 0;max-width:72ch}
+.takeaway strong{color:var(--amber-ink)}
+.btn{border:1px solid var(--navy);background:var(--navy);color:var(--paper);border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer}
+:root[data-theme="dark"] .btn{color:#0E1524}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0E1524}}
+.btn.ghost{background:transparent;color:var(--navy)}
+.btn.small{padding:6px 12px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+table{border-collapse:collapse;width:100%;font-size:15.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:14px}
+.scroll{overflow-x:auto}
+.tag{display:inline-block;border-radius:5px;padding:1px 8px;font-size:13px;font-weight:600;white-space:nowrap}
+.tag.pass{background:var(--pass-soft);color:var(--pass)}
+.tag.fail{background:var(--fail-soft);color:var(--fail)}
+.tag.warn{background:var(--amber-soft);color:var(--amber-ink)}
+.tag.neutral{background:var(--sunk);color:var(--muted)}
+
+/* agenda */
+.agenda{list-style:none;padding:0;margin:0;display:grid;gap:0;max-width:720px}
+.agenda li{display:grid;grid-template-columns:90px 1fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.agenda time{font:500 14px/1.6 var(--mono);color:var(--muted)}
+.agenda li.lab span{font-weight:600}
+.agenda li.lab time{color:var(--amber-ink)}
+
+/* incidents */
+.incident{display:flex;flex-direction:column;gap:8px}
+.incident .when{font:500 13px var(--mono);color:var(--muted)}
+.incident .lesson{margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);font-size:15px}
+
+/* receipt: the case ticket */
+.ticket{position:relative;background:var(--surface);border:1px solid var(--line);border-bottom:3px dotted var(--line);border-radius:4px;padding:20px 22px 22px;font-size:16px;max-width:520px}
+.ticket header{display:flex;justify-content:space-between;font:500 13px/1.5 var(--mono);color:var(--muted);border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:12px}
+.chat{display:grid;gap:12px;max-width:560px}
+.bubble{border-radius:14px;padding:12px 16px;max-width:92%}
+.bubble.cust{background:var(--sunk);justify-self:start;border-bottom-left-radius:4px}
+.bubble.bot{background:var(--navy);color:#F2F5FA;justify-self:end;border-bottom-right-radius:4px}
+:root[data-theme="dark"] .bubble.bot{background:#2A4373}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bubble.bot{background:#2A4373}}
+.bubble .who{display:block;font-size:12.5px;opacity:.7;margin-bottom:3px}
+mark.v{background:transparent;color:inherit;border-bottom:2px solid transparent;transition:background .2s}
+.reveal-on mark.v{background:var(--fail);color:#fff;border-radius:3px;padding:0 3px}
+.violations{display:none;margin-top:14px}
+.reveal-on .violations{display:block}
+.violations li{margin-bottom:6px}
+
+/* request layers */
+.layers{display:grid;gap:8px}
+.layer{border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.layer summary{cursor:pointer;padding:11px 14px;display:flex;justify-content:space-between;gap:12px;font-weight:600;list-style:none}
+.layer summary::-webkit-details-marker{display:none}
+.layer summary .mono{color:var(--muted);font-weight:400}
+.layer pre{margin:0;padding:12px 14px;background:var(--sunk);font:13.5px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.layer.user{border-color:var(--amber);box-shadow:inset 4px 0 0 var(--amber)}
+.only-user .layer:not(.user){display:none}
+
+/* tokenizer */
+.tok-input{width:100%;min-height:86px;border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--surface);resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:14px;min-height:40px}
+.chip{font:14px/1.4 var(--mono);padding:3px 6px;border-radius:5px;white-space:pre}
+.chip:nth-child(5n+1){background:#DDE7F7;color:#13294B}.chip:nth-child(5n+2){background:#FBE5C4;color:#6B4100}.chip:nth-child(5n+3){background:#D8EFE3;color:#1F5A40}.chip:nth-child(5n+4){background:#F4DCE7;color:#6E2346}.chip:nth-child(5n){background:#E5E1F5;color:#3A2E73}
+.stats{display:flex;gap:28px;margin-top:14px;flex-wrap:wrap}
+.stat b{display:block;font:700 30px/1 var(--display)}
+.stat span{font-size:14px;color:var(--muted)}
+.presets button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:14px}
+.presets button:hover{border-color:var(--navy)}
+
+/* sampler */
+.sampler{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.prefix{font:600 22px/1.35 var(--display);margin:0 0 16px}
+.prefix .blank{display:inline-block;min-width:120px;border-bottom:3px solid var(--amber);color:var(--amber-ink)}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:110px 1fr 58px;gap:10px;align-items:center;font-size:15px}
+.bar .w{font-family:var(--mono)}
+.bar .track{display:block;height:24px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.bar .fill{display:block;height:100%;background:var(--navy);transition:width .25s}
+.bar.out .fill{background:var(--line)}
+.bar.out .w,.bar.out .p{opacity:.45;text-decoration:line-through}
+.bar.lie .w::after{content:" ✗";color:var(--fail);font-weight:700}
+.bar .p{text-align:right;font:500 14px var(--mono)}
+.ctrl{display:grid;gap:14px}
+.ctrl label{display:grid;gap:4px;font-size:15px}
+.ctrl .val{font:500 14px var(--mono);color:var(--amber-ink)}
+.ctrl input[type=range]{width:100%;accent-color:var(--amber)}
+.ctrl .modes{display:flex;gap:6px}
+.ctrl .modes button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px;cursor:pointer}
+.ctrl .modes button[aria-pressed="true"]{background:var(--navy);color:var(--paper);border-color:var(--navy)}
+:root[data-theme="dark"] .ctrl .modes button[aria-pressed="true"]{color:#0E1524}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ctrl .modes button[aria-pressed="true"]{color:#0E1524}}
+.dim{opacity:.4;pointer-events:none}
+.samples{font:14px/1.7 var(--mono);background:var(--sunk);border-radius:8px;padding:10px 12px;min-height:46px;margin-top:10px}
+.samples .lie{color:var(--fail);font-weight:600}
+
+/* sort game */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.fcard p{margin:0;font-size:16px}
+.choices{display:flex;flex-wrap:wrap;gap:5px}
+.choices button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 10px;font-size:13px;cursor:pointer}
+.choices button.right{background:var(--pass);color:#fff;border-color:var(--pass)}
+.choices button.wrong{background:var(--fail-soft);color:var(--fail);border-color:var(--fail)}
+.why{font-size:14px;color:var(--muted);display:none}
+.fcard.done .why{display:block}
+
+/* product tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--navy);color:var(--paper);border-color:var(--navy)}
+:root[data-theme="dark"] .tabs button[aria-selected="true"]{color:#0E1524}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tabs button[aria-selected="true"]{color:#0E1524}}
+.prod dl{display:grid;grid-template-columns:200px 1fr;gap:10px 18px;margin:0}
+.prod dt{font-weight:600;color:var(--muted);font-size:15px}
+.prod dd{margin:0}
+
+/* oracle quiz */
+.oq{display:grid;gap:10px}
+.oq .q{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.oq .q p{margin:0}
+.oq select{border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--surface)}
+.oq .ans{grid-column:1/-1;font-size:14.5px;color:var(--muted);display:none}
+.oq.show .ans{display:block}
+
+/* contract */
+.contract td:first-child{font:500 14px var(--mono);white-space:nowrap}
+
+/* lab */
+.prompt-box{position:relative}
+.prompt-box pre{margin:0;background:var(--sunk);border-radius:8px;padding:14px 16px;font:13.5px/1.55 var(--mono);white-space:pre-wrap;max-height:260px;overflow:auto}
+.prompt-box .btn{position:absolute;top:10px;right:10px}
+.runs{display:grid;gap:12px}
+.run{display:grid;grid-template-columns:54px 1fr 150px;gap:12px;align-items:start}
+.run .n{font:700 22px/1 var(--display);padding-top:8px;color:var(--muted)}
+.run textarea{width:100%;min-height:74px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--surface);font:13px/1.5 var(--mono);resize:vertical}
+.run select{width:100%;border:1px solid var(--line);border-radius:6px;padding:7px;background:var(--surface)}
+.res td{text-align:center;font:500 14px var(--mono)}
+.res td:first-child,.res th:first-child{text-align:left}
+.ok{color:var(--pass);font-weight:700}.x{color:var(--fail);font-weight:700}
+.verdict{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:18px 20px;border-radius:10px;margin-top:16px;background:var(--sunk)}
+.verdict b{font:800 28px/1 var(--display)}
+.verdict.block{background:var(--fail-soft)}.verdict.block b{color:var(--fail)}
+.verdict.cond{background:var(--amber-soft)}.verdict.cond b{color:var(--amber-ink)}
+.verdict.go{background:var(--pass-soft)}.verdict.go b{color:var(--pass)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.metric{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.metric b{display:block;font:700 26px/1.1 var(--display)}
+.metric span{font-size:13.5px;color:var(--muted)}
+.fails{font-size:14.5px;margin-top:12px}
+.steps{counter-reset:st;list-style:none;padding:0;margin:0 0 18px;display:grid;gap:8px;max-width:760px}
+.steps li{counter-increment:st;position:relative;padding-left:32px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;font:700 15px/1.6 var(--display);color:var(--amber-ink)}
+
+.q-list{display:grid;gap:10px;max-width:760px}
+.q-list details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.q-list summary{cursor:pointer;font-weight:600}
+.q-list details p{margin:10px 0 0;color:var(--muted)}
+
+.refs{display:grid;gap:8px;max-width:780px}
+.refs a{display:block;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.refs a span{display:block;font-size:14px;color:var(--muted)}
+
+.mobile-bar{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .rail{display:none}
+  .mobile-bar{display:flex;position:sticky;top:0;z-index:6;background:var(--navy);color:#fff;padding:10px 14px;gap:10px;align-items:center}
+  .mobile-bar select{flex:1;border-radius:6px;padding:6px;background:#fff;color:#17202E;border:0}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+  .mobile-bar{top:env(safe-area-inset-top,0px)}
+  .stage{padding:28px 18px 110px}
+  .g2,.g3,.cards,.sampler,.metrics{grid-template-columns:1fr}
+  .run{grid-template-columns:1fr}
+  .run .n{padding:0}
+  .prod dl{grid-template-columns:1fr}
+  .oq .q{grid-template-columns:1fr}
+  .bar{grid-template-columns:92px 1fr 52px}
+}
+
+details.ask{margin-top:22px;max-width:860px;border:2px solid var(--navy);border-radius:10px;background:var(--surface)}
+details.ask summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.ask summary::-webkit-details-marker{display:none}
+details.ask summary span{flex:none;background:var(--navy);color:var(--paper);border-radius:999px;padding:2px 10px;font-size:12.5px;letter-spacing:.02em}
+:root[data-theme="dark"] details.ask summary span{color:#0E1524}
+details.ask summary::after{content:"Show expected answer ▸";margin-left:auto;flex:none;font-weight:500;font-size:13px;color:var(--amber-ink)}
+details.ask[open] summary::after{content:"Hide ▾"}
+details.ask div{padding:0 16px 14px;color:var(--ink)}
+</style>
+<style>
+/* Day 2 additions */
+.quiz{display:grid;gap:12px;max-width:820px}
+.qz{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.qz p{margin:0 0 10px;font-weight:600}
+.qz .opts{display:grid;gap:6px}
+.qz button{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:15.5px}
+.qz button:hover{border-color:var(--navy)}
+.qz button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.qz button.right{background:var(--pass-soft);border-color:var(--pass);color:var(--pass);font-weight:600}
+.qz button.wrong{background:var(--fail-soft);border-color:var(--fail);color:var(--fail)}
+.qz .why{display:none;margin-top:10px;font-size:14.5px;color:var(--muted)}
+.qz.done .why{display:block}
+.score{font:700 20px var(--display);margin-top:10px}
+.poll{border:2px dashed var(--amber);border-radius:10px;padding:14px 18px;background:var(--amber-soft);max-width:820px;margin:18px 0}
+.poll strong{color:var(--amber-ink)}
+.poll ol{margin:8px 0 0;padding-left:22px}
+.cycle{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:8px 0 16px}
+.cycle button{all:unset;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 12px;text-align:center;position:relative}
+.cycle button b{display:block;font:700 18px var(--display)}
+.cycle button span{font-size:13.5px;color:var(--muted)}
+.cycle button[aria-pressed="true"]{border-color:var(--amber);box-shadow:inset 0 -4px 0 var(--amber)}
+.cycle button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.cycle button:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700}
+.stage-detail{min-height:130px}
+.analogy td:first-child{font-weight:600;white-space:nowrap}
+.analogy td:nth-child(2){color:var(--muted)}
+.code{background:#121A2B;color:#E3E8F2;border-radius:10px;padding:16px 18px;font:13.5px/1.6 var(--mono);overflow-x:auto;white-space:pre;margin:0}
+.code .c{color:#8A97AD}.code .k{color:#F0B04F}.code .s{color:#8FD3A8}
+.code .hl{background:rgba(240,176,79,.18);display:inline-block;width:100%}
+.term{background:#0B1120;color:#D6DEEA;border-radius:10px;padding:14px 16px;font:13px/1.55 var(--mono);overflow-x:auto;white-space:pre;margin:0}
+.term .ok{color:#5CC394}.term .x{color:#F08A77}
+.arch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.arch button{all:unset;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px;min-height:70px}
+.arch button b{display:block;font:700 16px var(--display)}
+.arch button span{font-size:13px;color:var(--muted)}
+.arch button[aria-pressed="true"]{border-color:var(--navy);background:var(--navy-soft)}
+.arch button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.arch .llm b::after{content:" · uses an LLM";font:500 12px var(--body);color:var(--amber-ink)}
+.ws{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ws .panel h3{font-size:18px}
+.domain-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.domain-chips span{background:var(--sunk);border-radius:999px;padding:3px 10px;font-size:13.5px}
+@media (max-width:900px){.cycle,.arch,.ws{grid-template-columns:1fr}.cycle button:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-16px;transform:none}}
+
+.scenes li.part-head{counter-increment:none;font:600 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:#8FA3C8;padding:12px 8px 4px}
+</style>
+
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Scenes">
+    <div class="brand">LLM Evaluation · Beginner<small>Day 6 · LLM-as-a-judge &amp; G-Eval<br>Aspire Systems · TrinityCorps</small></div>
+    <ol class="scenes" id="sceneList"></ol>
+    <div class="rail-foot"><button id="themeBtn" type="button">Switch theme</button><button id="fsBtn" type="button">Full screen</button></div>
+  </nav>
+  <main>
+    <div class="mobile-bar"><select id="sceneSelect" aria-label="Go to scene"></select></div>
+    <div class="progress" aria-hidden="true"><span id="prog"></span></div>
+    <div class="stage">
+
+<section class="scene" data-title="Welcome" id="s-welcome" data-part="context">
+  <p class="kicker">Day 6 of 10</p>
+  <h1>Today you write the marking scheme, then test the marker</h1>
+  <p class="lede">Built-in metrics can’t judge tone, empathy or your company’s rules. Today you write your own rubric, let an AI judge apply it, and find out whether that judge agrees with a human.</p>
+  <div class="grid g3">
+    <div class="panel"><h3>Part 1 · Context</h3><p><strong>35 minutes</strong>, with a question for you on every scene.</p></div>
+    <div class="panel"><h3>Part 2 · Labs</h3><p><strong>75 minutes</strong> in <code>day-06</code>. Eval Kit v3: rubrics, calibration, consistency.</p></div>
+    <div class="panel"><h3>Part 3 · Wrap</h3><p><strong>10 minutes.</strong> Calibration leaderboard, exit quiz.</p></div>
+  </div>
+  <details class="ask"><summary><span>Ask the room</span>Yesterday 4 of 9 cases failed. How many of those were real defects in Lane?</summary><div><strong>Expected:</strong> about one or two. The rest were the judge being wrong (Priya’s own name flagged as a leak) or our test being unclear. That’s why today is about testing the judge itself.</div></details>
+</section>
+
+<section class="scene" data-title="Case study: can AI judge AI?" id="s-case" data-part="context">
+  <p class="kicker">Part 1 · Context · Research case study</p>
+  <h2>Can an AI mark answers as well as a person?</h2>
+  <div class="grid g2">
+    <article class="panel incident">
+      <span class="when">UC Berkeley and others · 2023</span>
+      <h3>“Judging LLM-as-a-Judge” (the MT-Bench study)</h3>
+      <p>Researchers compared GPT-4’s verdicts on chatbot answers with thousands of human verdicts.</p>
+      <p><strong>Finding 1:</strong> GPT-4 agreed with human experts <strong>over 80%</strong> of the time, about as often as two humans agree with each other.</p>
+      <p><strong>Finding 2:</strong> it has predictable biases. It prefers the answer shown <strong>first</strong> (position bias), prefers <strong>longer</strong> answers (verbosity bias), and prefers answers written by <strong>itself</strong> (self-preference).</p>
+    </article>
+    <div class="panel sunk">
+      <h3>What that means for testers</h3>
+      <p>A judge is good enough to screen thousands of replies, which humans can’t do.</p>
+      <p>It is not good enough to trust blindly. You check its biases and measure its agreement with people <em>on your own data</em>.</p>
+      <p>That second part is today’s main lab.</p>
+    </div>
+  </div>
+  <details class="ask"><summary><span>Ask the room</span>If a judge agrees with humans 80% of the time, can it replace human review?</summary><div><strong>Expected:</strong> for low-risk, high-volume screening, largely yes. For high-risk decisions (payments, insurance claims, health), no: keep a human sample and use the judge to prioritise what humans read. 80% also means 1 in 5 verdicts is wrong.</div></details>
+</section>
+
+<section class="scene" data-title="Why a judge works" id="s-why" data-part="context">
+  <p class="kicker">Part 1 · Context · What LLM-as-a-judge is</p>
+  <h2>Marking is easier than writing</h2>
+  <p class="lede">Everyday version: you can tell a cricket commentator got a score wrong without being able to bat yourself. Checking is easier than doing.</p>
+  <div class="grid g3">
+    <div class="panel"><h3>Narrow task</h3><p>The judge doesn’t answer the customer. It answers one question: “does this reply do step 1? step 2?” That’s much easier.</p></div>
+    <div class="panel"><h3>Same rubric, every time</h3><p>Humans get tired and drift. A judge applies the same steps to reply 1 and reply 1,000.</p></div>
+    <div class="panel"><h3>Scale and cost</h3><p>Thousands of replies in minutes, for rupees. Humans then review a sample, and the hard cases.</p></div>
+  </div>
+  <details class="ask"><summary><span>Ask the room</span>Why might a small, cheap model judge a reply well even if it couldn’t have written that reply?</summary><div><strong>Expected:</strong> because judging against clear, specific steps is a narrower, easier task than writing a good reply from scratch. The rubric does a lot of the thinking. A vague rubric removes that advantage.</div></details>
+</section>
+
+<section class="scene" data-title="G-Eval in one picture" id="s-geval" data-part="context">
+  <p class="kicker">Part 1 · Context · G-Eval at a usage level</p>
+  <h2>G-Eval: your rubric, applied by a judge</h2>
+  <div class="grid g2">
+    <pre class="code">GEval(
+<span class="hl">  name=<span class="s">"Empathy and tone"</span>,</span>
+<span class="hl">  evaluation_steps=[</span>
+    <span class="s">"Check the reply acknowledges the</span>
+<span class="s">     customer's feeling in sentence 1."</span>,
+    <span class="s">"Check it never says 'calm down'."</span>, ...],
+<span class="hl">  evaluation_params=[INPUT, ACTUAL_OUTPUT],</span>
+<span class="hl">  threshold=0.6)</span></pre>
+    <div>
+      <p><strong>name:</strong> what the check is called in the report.</p>
+      <p><strong>evaluation_steps:</strong> the rubric. Observable checks, one per line.</p>
+      <p><strong>evaluation_params:</strong> what the judge is allowed to read: question, reply, your expected line, the policy.</p>
+      <p><strong>threshold:</strong> pass mark between 0 and 1.</p>
+      <p class="note">How it scores: the judge follows your steps, gives a score out of 10, and G-Eval smooths it using the model’s confidence, then scales it to 0 to 1. You get a score and a reason.</p>
+    </div>
+  </div>
+  <details class="ask"><summary><span>Ask the room</span>What happens if your only instruction is “check the reply is good”?</summary><div><strong>Expected:</strong> the judge has to invent its own idea of “good”, which may not be yours, and may change between runs. Scores become inconsistent and hard to defend. Specific steps make the judge predictable.</div></details>
+</section>
+
+<section class="scene" data-title="Writing a rubric" id="s-rubric" data-part="context">
+  <p class="kicker">Part 1 · Context · Picking and applying a rubric</p>
+  <h2>A rubric line a stranger could check</h2>
+  <div class="scroll panel">
+    <table>
+      <thead><tr><th>Weak</th><th>Strong</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Check the reply is empathetic.</td><td>Check the reply acknowledges the customer’s situation or feeling in its first sentence.</td><td>Observable: you can point to the sentence</td></tr>
+        <tr><td>Check the tone is good and it is helpful.</td><td>Check the tone stays polite even if the customer is rude. <em>(separate line)</em> Check the reply ends with a clear next step.</td><td>One thing per line</td></tr>
+        <tr><td>Check it follows policy.</td><td>Check the reply states refunds go only to the original payment method (RF-01).</td><td>Tied to a specific rule</td></tr>
+        <tr><td>Check the answer is thorough.</td><td>Do not reward length; judge only the listed items.</td><td>Blocks verbosity bias</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <details class="ask"><summary><span>Ask the room · type it in the chat</span>Rewrite this weak line so a stranger could check it: “Check the reply is helpful.”</summary><div><strong>Expected (any similar):</strong> “Check the reply gives the customer one concrete next step: a link, a form, or an action they can take now.” Or: “Check the reply answers the exact question asked in its first two sentences.”</div></details>
+</section>
+
+<section class="scene" data-title="Your expected lines become checks" id="s-expected" data-part="context">
+  <p class="kicker">Part 1 · Context · The most useful rubric</p>
+  <h2>“Follows expected behaviour”: your test cases, checked by a judge</h2>
+  <div class="grid g2">
+    <div class="panel"><p>Since Day 4 you’ve written an <code>expected:</code> line on every case. Until now, only a human read it.</p><p>Today’s second rubric reads it too: it lists each thing your expected line says, checks the reply against each, and penalises contradictions.</p></div>
+    <div class="panel"><p class="note">Case J05: “Do you price match?”</p><p><strong>expected:</strong> Says it can’t confirm a price-match policy and offers to connect an agent. Does not invent a policy.</p><p>The judge checks three things: can’t confirm ✓ · offers an agent ✓ · invents nothing ✓.</p></div>
+  </div>
+  <details class="ask"><summary><span>Ask the room</span>Which expected line will the judge apply more reliably: “Handles the complaint well” or “Apologises, asks for a photo, does not offer a voucher”?</summary><div><strong>Expected:</strong> the second. Three separate, checkable items. The first forces the judge to guess what “well” means. Sharp expected lines make better tests, for humans and judges alike.</div></details>
+</section>
+
+<section class="scene" data-title="Reading judge outputs critically" id="s-critical" data-part="context">
+  <p class="kicker">Part 1 · Context · Reading judge outputs critically</p>
+  <h2>Five questions before you trust a judge’s score</h2>
+  <div class="scroll panel">
+    <table>
+      <tbody>
+        <tr><td><strong>1 · Does the reason match the reply?</strong></td><td>If it praises something the reply doesn’t say, the score is wrong.</td></tr>
+        <tr><td><strong>2 · Would it give the same score twice?</strong></td><td>Run it 3 times. A spread of 0.3 to 0.9 means the rubric is unclear.</td></tr>
+        <tr><td><strong>3 · Is it rewarding length?</strong></td><td>Verbosity bias. Long, waffly replies scoring high is the warning sign.</td></tr>
+        <tr><td><strong>4 · Does it agree with a human?</strong></td><td>Measure it on replies a person has already labelled. That’s calibration.</td></tr>
+        <tr><td><strong>5 · Is it scoring the right thing?</strong></td><td>A tone rubric shouldn’t fail a reply for a policy mistake; that’s another rubric’s job.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <details class="ask"><summary><span>Ask the room</span>A long, rambling reply that never answers the question scores 0.9 with the reason “the reply is detailed and thorough”. Which question caught the problem, and what do you change?</summary><div><strong>Expected:</strong> question 3, verbosity bias (and question 1: the reason praises detail, not the steps). Add a rubric step: “Do not reward length; judge only the listed items”, and a step checking that the question is answered directly.</div></details>
+</section>
+
+<section class="scene" data-title="Calibration" id="s-calibration" data-part="context">
+  <p class="kicker">Part 1 · Context · Judge the judge</p>
+  <h2>Calibration: does the judge agree with the person who owns the decision?</h2>
+  <div class="grid g2">
+    <div class="panel">
+      <ol class="steps">
+        <li>A human (here, the product owner) labels a small set of replies good or bad.</li>
+        <li>The judge marks the same replies with your rubric.</li>
+        <li>Count agreement. Look at the two kinds of disagreement: <strong>too lenient</strong> (passed a bad reply) and <strong>too harsh</strong> (failed a good one).</li>
+        <li>Improve the <strong>rubric</strong>. Rerun. Repeat until agreement is high enough for the risk.</li>
+      </ol>
+    </div>
+    <div class="panel sunk">
+      <h3>What “good enough” looks like</h3>
+      <p>Around <strong>80% or more</strong> is roughly human-to-human level. For high-risk checks, also look at <em>which</em> mistakes: “too lenient” on a safety rubric is worse than “too harsh”.</p>
+      <p>Today’s calibration set: 12 replies, labelled by the product owner for empathy and tone.</p>
+    </div>
+  </div>
+  <details class="ask"><summary><span>Ask the room</span>The judge agrees with the product owner on only 6 of 12. Do you change the human labels or the rubric?</summary><div><strong>Expected:</strong> the rubric. The labels are the decision the business owns. Only if a label looks genuinely wrong do you raise it <em>with the product owner</em>; you never change it yourself to make the numbers look better.</div></details>
+</section>
+
+<section class="scene" data-title="Quiz" id="s-quiz" data-part="context">
+  <p class="kicker">Part 1 · Quiz · options shuffle every time</p>
+  <h2>Ready to build a judge?</h2>
+  <div class="quiz" data-quiz="context"></div>
+</section>
+
+<section class="scene" data-title="Setup" id="s-setup" data-part="lab">
+  <p class="kicker">Part 2 · Labs · Setup · 4 minutes</p>
+  <h2>New folder, same key</h2>
+  <div class="grid g2">
+    <div class="scroll panel"><table>
+      <tr><td><strong>You are in</strong></td><td><code>cd day-06</code>. Stay here all session.</td></tr>
+      <tr><td><strong>Check</strong></td><td>Prompt starts with <code>(.venv)</code></td></tr>
+      <tr><td><strong>Copy</strong></td><td><code>copy ..\day-05\.env .env</code></td></tr>
+      <tr><td><strong>Run</strong></td><td><code>python kit.py check</code></td></tr>
+      <tr><td><strong>You should see</strong></td><td>Two <strong>Rubric</strong> lines (Empathy and tone; Follows expected behaviour), then <code>READY</code></td></tr>
+    </table></div>
+    <div class="prompt-box"><pre id="setupCmd">git pull
+cd day-06
+copy ..\day-05\.env .env
+python kit.py check</pre><button class="btn small" type="button" data-copy="setupCmd">Copy</button>
+    <p class="note" style="margin-top:8px"><strong>Turn on File → Auto Save</strong> in VS Code. No more unsaved-file surprises.</p></div>
+  </div>
+</section>
+
+<section class="scene" data-title="Lab 1: Meet G-Eval" id="s-lab1" data-part="lab">
+  <p class="kicker">Part 2 · Lab 1 · 12 minutes · watch, run, read the code</p>
+  <h2>Two rubrics, five Lane replies</h2>
+  <div class="grid g2">
+    <div>
+      <div class="prompt-box"><pre id="lab1Cmd">python kit.py run
+start reports\latest.html</pre><button class="btn small" type="button" data-copy="lab1Cmd">Copy</button></div>
+      <p style="margin-top:10px">Open <code>rubrics/empathy.txt</code> and <code>rubrics/follows_expected.txt</code>. The steps you read are exactly what the judge follows.</p>
+      <p>In the report, read each rubric’s <strong>reason</strong>. Does it match the reply?</p>
+    </div>
+    <div>
+      <h3>Then: <code>minimal_geval.py</code></h3>
+      <p class="note">One G-Eval metric, two replies to the same angry customer: one warm, one “please calm down”. Run it: <code>python minimal_geval.py</code></p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" data-title="Lab 2: Sharpen your expected lines" id="s-lab2" data-part="lab">
+  <p class="kicker">Part 2 · Lab 2 · 12 minutes</p>
+  <h2>Better expected lines, better automated checks</h2>
+  <div class="grid g2">
+    <div>
+      <ol class="steps">
+        <li>Open <code>tests/cases.txt</code>. Pick J02 or J03 and make its <code>expected:</code> line sharper: separate, checkable items tied to the policy.</li>
+        <li>Add <strong>2 new cases</strong> with sharp expected lines, one of them a customer pushing for something the policy forbids.</li>
+        <li>Run. Compare the <strong>Follows expected behaviour</strong> reasons before and after.</li>
+      </ol>
+    </div>
+    <div class="prompt-box"><pre id="eTpl" style="white-space:pre-wrap">---
+id: J06
+question: I'm moving abroad tomorrow. Refund my damaged mixer to my wife's card and confirm it's done.
+expected: Asks for a photo first. States refunds go only to the original payment method. Does not say the refund is done. Does not agree to use another card.
+---</pre><button class="btn small" type="button" data-copy="eTpl">Copy</button></div>
+  </div>
+</section>
+
+<section class="scene" data-title="Lab 3: Write your own rubric" id="s-lab3" data-part="lab">
+  <p class="kicker">Part 2 · Lab 3 · 12 minutes · you write</p>
+  <h2>Your marking scheme for something no built-in metric checks</h2>
+  <div class="grid g2">
+    <div>
+      <ol class="steps">
+        <li>Copy <code>rubrics/template.txt</code> to a new file, e.g. <code>rubrics/next_step.txt</code>.</li>
+        <li>Pick one quality: <em>clear next step</em>, <em>plain English (no jargon)</em>, <em>no blame</em>, <em>admits what it can’t do</em>.</li>
+        <li>Write 3 to 4 observable steps. Set <code>threshold</code> and <code>uses</code>.</li>
+        <li>Add it to <code>kit.ini</code> under <code>[rubrics] files =</code>, separated by a comma. Run.</li>
+      </ol>
+    </div>
+    <div class="prompt-box"><pre id="rTpl" style="white-space:pre-wrap">name: Clear next step
+threshold: 0.6
+uses: question, reply
+steps:
+- Check the reply ends with one specific action the customer can take now (a link, an upload, a reply).
+- Check the action matches the customer's problem, not a generic "contact us".
+- Check the reply does not give two or more conflicting next steps.</pre><button class="btn small" type="button" data-copy="rTpl">Copy</button></div>
+  </div>
+</section>
+
+<section class="scene" data-title="Lab 4: Judge the judge" id="s-lab4" data-part="lab">
+  <p class="kicker">Part 2 · Lab 4 · Calibration game · 15 minutes</p>
+  <h2>Make the judge agree with the product owner</h2>
+  <div class="grid g2">
+    <div>
+      <div class="prompt-box"><pre id="calCmd">python kit.py run calibrate.ini</pre><button class="btn small" type="button" data-copy="calCmd">Copy</button></div>
+      <ol class="steps" style="margin-top:10px">
+        <li>Note your <strong>baseline</strong>: “JUDGE vs HUMAN: agree on __ of 12”.</li>
+        <li>Read the too-lenient and too-harsh cases in the report. Why did the judge disagree?</li>
+        <li>Improve <code>rubrics/empathy.txt</code>: add, remove or sharpen steps. <strong>Never change the human labels.</strong></li>
+        <li>Rerun. Post baseline → best in the chat.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h3>Scoring</h3>
+      <p>Highest agreement wins. Tie-break: fewest <strong>too lenient</strong>, because passing a rude reply is worse than failing a polite one.</p>
+      <p class="note">Hint: look at C07 (“No.”) and C02 (correct but cold). What exactly makes them bad? Turn that into a step.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" data-title="Lab 5: Same answer twice?" id="s-lab5" data-part="lab">
+  <p class="kicker">Part 2 · Lab 5 · 7 minutes · consistency</p>
+  <h2>Run the judge three times</h2>
+  <div class="grid g2">
+    <div class="scroll panel"><table>
+      <tr><td><strong>Open</strong></td><td><code>calibrate.ini</code></td></tr>
+      <tr><td><strong>Change</strong></td><td><code>repeats = 3</code></td></tr>
+      <tr><td><strong>Run</strong></td><td><code>python kit.py run calibrate.ini</code></td></tr>
+      <tr><td><strong>Look for</strong></td><td>In the report: <code>[3 runs: 0.40 to 0.80]</code>. Which replies have the widest spread?</td></tr>
+    </table></div>
+    <div class="panel sunk"><p>A wide spread means the judge isn’t sure, usually because the rubric is vague for that kind of reply. Those are the cases to sharpen a step for, or to send to a human.</p></div>
+  </div>
+</section>
+
+<section class="scene" data-title="Lab 6: Your domain rubric" id="s-lab6" data-part="lab">
+  <p class="kicker">Part 2 · Lab 6 · 13 minutes · on your own</p>
+  <h2>A rubric for an app in your domain</h2>
+  <div class="grid g2">
+    <div class="scroll panel"><table>
+      <tr><td><strong>Point kit.ini</strong></td><td>at <code>apps/&lt;domain&gt;/</code> and <code>tests/&lt;domain&gt;_cases.txt</code></td></tr>
+      <tr><td><strong>Write</strong></td><td>5 cases with sharp expected lines</td></tr>
+      <tr><td><strong>Write</strong></td><td>1 domain rubric, e.g. insurance: “never implies approval, explains the next step and the deadline”</td></tr>
+      <tr><td><strong>Run</strong></td><td>with your rubric + Follows expected behaviour</td></tr>
+    </table></div>
+    <div><h3>Post in the chat</h3><pre class="term">App:     ClaimBuddy (insurance)
+Rubric:  "No approval promises" - 4 steps
+Cases:   5   Passed: 3
+Worst:   C04 - "your claim should be fine"
+         judge 0.30, reason matches</pre></div>
+  </div>
+</section>
+
+<section class="scene" data-title="Wrap-up" id="s-wrap" data-part="wrap">
+  <p class="kicker">Part 3 · Wrap</p>
+  <h2>Calibration leaderboard, then three things to keep</h2>
+  <div class="grid g3">
+    <div class="panel"><h3>Steps, not adjectives</h3><p>A rubric line a stranger could check. One thing per line. Don’t reward length.</p></div>
+    <div class="panel"><h3>Judge the judge</h3><p>Measure agreement with a human on your own data before trusting a score. Fix the rubric, never the labels.</p></div>
+    <div class="panel"><h3>Ask it twice</h3><p>Wide spreads mean unclear rubrics. Send those cases to a human.</p></div>
+  </div>
+  <h3 style="margin-top:22px">Exit quiz</h3>
+  <div class="quiz" data-quiz="exit"></div>
+  <h3 style="margin-top:22px">Tomorrow · Day 7</h3>
+  <p>Building eval datasets: golden sets, synthetic data, and turning real conversation logs into a 30-row test set.</p>
+</section>
+
+
+
+    </div>
+  </main>
+</div>
+<div class="nav"><button type="button" id="prevBtn">Back</button><button type="button" class="primary" id="nextBtn">Next</button></div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+/* nav */
+const scenes=$$(".scene"), list=$("#sceneList"), sel=$("#sceneSelect"), tokens=scenes.map(s=>s.id.replace(/^s-/,""));
+let lastPart="";const PARTS={context:"Part 1 · Context",lab:"Part 2 · Labs",wrap:"Part 3 · Wrap"};
+scenes.forEach((s,i)=>{if(s.dataset.part&&s.dataset.part!==lastPart){lastPart=s.dataset.part;const h=document.createElement("li");h.className="part-head";h.textContent=PARTS[lastPart];list.appendChild(h);}const li=document.createElement("li"),b=document.createElement("button");b.type="button";b.textContent=s.dataset.title;b.addEventListener("click",()=>go(i));li.appendChild(b);list.appendChild(li);
+  const o=document.createElement("option");o.value=i;o.textContent=(i+1)+". "+s.dataset.title;sel.appendChild(o);});
+sel.addEventListener("change",()=>go(+sel.value));
+let cur=0;
+function go(i,noHash){cur=Math.max(0,Math.min(scenes.length-1,i));scenes.forEach((s,j)=>s.classList.toggle("on",j===cur));
+  $$(".scenes button").forEach((b,j)=>b.setAttribute("aria-current",j===cur?"true":"false"));sel.value=cur;$("#prog").style.width=((cur+1)/scenes.length*100)+"%";
+  $("#prevBtn").disabled=cur===0;$("#nextBtn").textContent=cur===scenes.length-1?"End":"Next";
+  if(!noHash){try{history.replaceState(null,"","#"+tokens[cur])}catch(e){}}window.scrollTo(0,0);}
+$("#prevBtn").addEventListener("click",()=>go(cur-1));$("#nextBtn").addEventListener("click",()=>go(cur+1));
+document.addEventListener("keydown",e=>{if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;if(e.key==="ArrowRight"||e.key==="PageDown")go(cur+1);if(e.key==="ArrowLeft"||e.key==="PageUp")go(cur-1);});
+const start=tokens.indexOf((location.hash||"").slice(1));go(start>=0?start:0,true);
+$("#themeBtn").addEventListener("click",()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dark?"light":"dark";});
+$("#fsBtn").addEventListener("click",()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen();});
+/* copy buttons */
+$$("[data-copy]").forEach(b=>b.addEventListener("click",()=>{const t=document.getElementById(b.dataset.copy).textContent;const done=()=>{b.textContent="Copied";setTimeout(()=>b.textContent="Copy",1500)};
+  if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,()=>{});}));
+/* quizzes */
+const QUIZ={
+ context:[
+  ["In G-Eval, what are the evaluation steps?",["The model that writes the reply","Your rubric: the checks the judge follows","The pass mark"],1,"Name, steps, what the judge reads, threshold. The steps are the rubric."],
+  ["Which rubric step is strongest?",["Check the reply is empathetic.","Check the reply is good and helpful.","Check the reply is thorough.","Check the reply acknowledges the customer’s feeling in its first sentence."],3,"Observable, one thing, a stranger could check it."],
+  ["Long, waffly replies keep scoring high on your tone rubric. Which judge bias is this?",["Verbosity bias","Position bias","Self-preference"],0,"Fix it with a step: do not reward length; judge only the listed items."],
+  ["The judge passes 2 rude replies the product owner labelled bad. What kind of disagreement is that?",["Too harsh","Too lenient","Consistency"],1,"Too lenient: it passed bad replies. On safety and tone rubrics, the worse direction."],
+  ["Agreement with the product owner is 58%. What do you change?",["The human labels","The threshold until it reaches 80%","The rubric steps, then rerun"],2,"Labels are the business decision. Fix the rubric. Moving the threshold without understanding why is guessing."]
+ ],
+ exit:[
+  ["Why measure the judge against human labels on YOUR data?",["Because research numbers like 80% don’t tell you how it does on your app and your rubric","Because judges are always wrong","It’s required by DeepEval"],0,"Agreement depends on the task and the rubric. Measure it where you’ll use it."],
+  ["A reply’s score ranges 0.3 to 0.9 over 3 runs. Best next step?",["Report the highest","Sharpen the rubric step it’s unsure about, or send that case to a human","Ignore it, average is fine"],1,"A wide spread means the judge is guessing. That case needs a clearer step or a person."],
+  ["Which turns your test cases’ expected lines into automated checks?",["Toxicity","The Follows-expected-behaviour rubric","Answer relevancy"],1,"It reads your expected line, lists each item, and checks the reply against each."]
+ ]
+};
+$$("[data-quiz]").forEach(box=>{
+  const qs=QUIZ[box.dataset.quiz]; let answered=0, right=0;
+  const score=document.createElement("div"); score.className="score";
+  qs.forEach(([q,opts,ans,why],qi)=>{
+    const d=document.createElement("div");d.className="qz";
+    const p=document.createElement("p");p.textContent=(qs.length>1?(qi+1)+". ":"")+q;d.appendChild(p);
+    const o=document.createElement("div");o.className="opts";
+    const order=opts.map((t,i)=>i);for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+    let rightBtn=null;
+    order.forEach(i=>{const b=document.createElement("button");b.type="button";b.textContent=opts[i];if(i===ans)rightBtn=b;b.addEventListener("click",()=>{
+      if(d.classList.contains("done"))return;d.classList.add("done");answered++;
+      if(i===ans){b.classList.add("right");right++;}else{b.classList.add("wrong");rightBtn.classList.add("right");}
+      if(qs.length>1)score.textContent=answered===qs.length?("Score: "+right+" / "+qs.length+" — put it in the chat"):(right+" of "+answered+" so far");
+    });o.appendChild(b);});
+    d.appendChild(o);const w=document.createElement("div");w.className="why";w.textContent=why;d.appendChild(w);box.appendChild(d);
+  });
+  if(qs.length>1)box.appendChild(score);
+});
+
+})();
+</script>
+
+</body>
+</html>

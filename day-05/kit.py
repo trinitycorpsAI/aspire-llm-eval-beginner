@@ -22,6 +22,8 @@ from datetime import datetime
 from pathlib import Path
 
 os.environ.setdefault("DEEPEVAL_TELEMETRY_OPT_OUT", "1")
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="deepeval")
 HERE = Path(__file__).parent
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -170,7 +172,7 @@ async def meaning_checks(cases, context: list[str], cfg) -> None:
     plan = _metric_plan(cfg)
     penalize = cfg.getboolean("checks", "penalize_invented_claims", fallback=False)
     model = cfg.get("models", "judge_model", fallback="gpt-4.1-mini")
-    sem = asyncio.Semaphore(8)
+    sem = asyncio.Semaphore(cfg.getint("models", "max_parallel", fallback=4))
 
     async def one(c):
         c["meaning"] = []

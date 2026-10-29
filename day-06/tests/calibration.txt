@@ -1,0 +1,76 @@
+# CALIBRATION SET - 12 replies the product owner has already labelled for EMPATHY AND TONE.
+# human: good / bad is the product owner's verdict. Your job: make the judge agree with her.
+# Do not change the human labels. Change the RUBRIC (rubrics/empathy.txt) and rerun.
+
+id: C01
+question: My kettle arrived broken.
+expected: Empathetic, polite, no blame, clear next step.
+reply: I'm really sorry your kettle arrived broken - that's frustrating. Could you upload a photo of the damage? Once we've reviewed it, we'll refund your original payment method within 5-7 working days.
+human: good
+---
+id: C02
+question: My kettle arrived broken.
+expected: Empathetic, polite, no blame, clear next step.
+reply: Upload a photo of the damage. Refunds take 5-7 working days.
+human: bad
+---
+id: C03
+question: This is the third broken item! Are you useless?
+expected: Empathetic, polite, no blame, clear next step.
+reply: I completely understand your frustration - three damaged items is not acceptable, and I'm sorry. Please upload a photo of this one and I'll make sure it's reviewed quickly.
+human: good
+---
+id: C04
+question: This is the third broken item! Are you useless?
+expected: Empathetic, polite, no blame, clear next step.
+reply: Please calm down. We ship thousands of items and some get damaged. Upload a photo.
+human: bad
+---
+id: C05
+question: Where is my order? It's late.
+expected: Empathetic, polite, no blame, clear next step.
+reply: Orders take 3-5 working days. Maybe you didn't read the delivery estimate properly.
+human: bad
+---
+id: C06
+question: Where is my order? It's late.
+expected: Empathetic, polite, no blame, clear next step.
+reply: Sorry your order is running late. You can track it here: harbourandlane.co.uk/track/HL-50112. Would you like me to escalate it to our delivery team?
+human: good
+---
+id: C07
+question: Can I return a blender after 40 days?
+expected: Empathetic, polite, no blame, clear next step.
+reply: No.
+human: bad
+---
+id: C08
+question: Can I return a blender after 40 days?
+expected: Empathetic, polite, no blame, clear next step.
+reply: I'm sorry, change-of-mind returns are only accepted within 30 days. If it develops a fault, though, we can still help - just get in touch.
+human: good
+---
+id: C09
+question: My refund hasn't arrived after 3 days.
+expected: Empathetic, polite, no blame, clear next step.
+reply: Refunds take 5-7 working days, as clearly stated in our policy. Please be patient and stop contacting us.
+human: bad
+---
+id: C10
+question: My refund hasn't arrived after 3 days.
+expected: Empathetic, polite, no blame, clear next step.
+reply: I understand waiting is frustrating. Refunds take 5-7 working days after the photo review, so it should arrive soon. If it hasn't by then, reply here and I'll chase it.
+human: good
+---
+id: C11
+question: I'm so angry, the mixer broke on day one!
+expected: Empathetic, polite, no blame, clear next step.
+reply: Oh dear, sounds like someone had a bad day! Send a photo and we'll see what we can do.
+human: bad
+---
+id: C12
+question: I'm so angry, the mixer broke on day one!
+expected: Empathetic, polite, no blame, clear next step.
+reply: I'm so sorry - a mixer breaking on day one is really disappointing. Please upload a photo and we'll review it and arrange your refund to the original payment method.
+human: good
+---

@@ -13,11 +13,15 @@ whether it is safe to release. Every day adds one more kind of evidence.
 | 3 | Ragas, OpenAI Evals, LangSmith, framework anatomy | `day-03` |
 | 4 | Relevancy & faithfulness | `day-04` |
 | 5 | Hallucination, toxicity, bias, PII | `day-05` |
-| 6 | LLM-as-a-judge, G-Eval | coming |
+| 6 | LLM-as-a-judge, G-Eval | `day-06` |
 | 7 | Building eval datasets | coming |
 | 8 | Evaluating RAG outputs | coming |
 | 9 | Prompt injection, bias, EU AI Act, India AI guidance | coming |
 | 10 | Capstone | coming |
+
+## Day 6
+
+- `day-06/` - Eval Kit v3: your own rubrics (G-Eval), calibration against human labels. Start with `day-06/README.md`. Copy your key: `copy ..\day-05\.env .env`.
 
 ## Day 5
 
