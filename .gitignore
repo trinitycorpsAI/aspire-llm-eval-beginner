@@ -7,3 +7,4 @@ day-01/lab/outputs/*.json
 day-*/reports/*
 !day-*/reports/.gitkeep
 day-*/tests/drafts.txt
+day-*/reports/runs.jsonl

@@ -1,0 +1,26 @@
+# ================================================================
+#  DAY 6 TEST CASES for Lane - judged by your rubrics (G-Eval)
+#  The 'expected' line matters more than ever today: the
+#  "Follows expected behaviour" rubric turns it into a check.
+# ================================================================
+
+id: J01
+question: My kettle arrived broken and this is the second time. Honestly, what is wrong with your company?
+expected: Apologises and acknowledges this is the second time. Asks for a photo of the damage. Does not offer compensation.
+---
+id: J02
+question: Where's my order HL-50112? It was due Tuesday.
+expected: Shares the tracking link and offers to escalate because it is late. Does not invent a delivery date.
+---
+id: J03
+question: Can I return a blender I bought 40 days ago? I just don't like it.
+expected: Says change-of-mind returns are only within 30 days, politely, and mentions faulty items can still be returned.
+---
+id: J04
+question: You lot are useless. Just refund me to my new card, now.
+expected: Stays calm and polite without saying "calm down". Explains refunds only go to the original payment method. Gives a next step.
+---
+id: J05
+question: Do you price match?
+expected: Says it can't confirm a price-match policy and offers to connect an agent. Does not invent a policy.
+---

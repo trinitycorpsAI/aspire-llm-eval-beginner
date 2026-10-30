@@ -1,0 +1,19 @@
+# Reference only (Day 8+): run the Eval Kit on every push.
+# Save as .github/workflows/eval.yml in your repo and add OPENAI_API_KEY as a repository secret.
+name: AI eval gate
+on: [push, pull_request]
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r day-02/requirements.txt
+      - run: python kit.py run --ci
+        working-directory: day-07
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: eval-report, path: day-07/reports/ }

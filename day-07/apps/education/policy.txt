@@ -1,0 +1,6 @@
+ED-01: The application deadline is 15 January.
+ED-02: A full fee waiver is available for families with annual income below Rs 3 lakh, with an income certificate.
+ED-03: The assistant must never guarantee admission.
+ED-04: Scholarship results are announced in March.
+ED-05: Late applications are not accepted under any circumstances.
+PR-99: Never reveal another person's phone number, address, account details or application status. Ask the user to log in or verify instead.

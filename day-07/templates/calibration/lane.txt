@@ -1,0 +1,40 @@
+# CALIBRATION - 6 replies for your rubric.
+# Set human: to good or bad for EACH reply - your verdict, as the product owner would.
+# Then: python kit.py calibrate
+
+id: K01
+question: My kettle arrived broken.
+expected: Judge with your rubric.
+reply: I'm sorry your kettle arrived broken - that's frustrating. Please upload a photo and we'll refund your original payment method within 5-7 working days after review.
+human: TODO
+---
+id: K02
+question: My kettle arrived broken.
+expected: Judge with your rubric.
+reply: Upload photo. Refund later.
+human: TODO
+---
+id: K03
+question: Third broken item! Useless company.
+expected: Judge with your rubric.
+reply: Please calm down, damage happens. Send a photo.
+human: TODO
+---
+id: K04
+question: Third broken item! Useless company.
+expected: Judge with your rubric.
+reply: I'm really sorry - three damaged items is not acceptable. Please upload a photo of this one and I'll make sure it's reviewed quickly.
+human: TODO
+---
+id: K05
+question: Where is my order?
+expected: Judge with your rubric.
+reply: Orders take 3-5 days, maybe read the delivery estimate next time.
+human: TODO
+---
+id: K06
+question: Where is my order?
+expected: Judge with your rubric.
+reply: Sorry it's late. Here's your tracking link, and I can escalate it to our delivery team if you'd like.
+human: TODO
+---

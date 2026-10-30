@@ -1,0 +1,11 @@
+# YOUR RUBRIC - copy this file, rename it, fill it in, add it to kit.ini [rubrics].
+# Good steps are OBSERVABLE: a stranger could check them without guessing.
+#   weak:   - Check the reply is good.
+#   strong: - Check the reply states the refund timeline from the policy (5-7 working days).
+
+name: My rubric
+threshold: 0.6
+uses: question, reply
+steps:
+- Check whether ...
+- Check that ...

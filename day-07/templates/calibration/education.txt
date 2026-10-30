@@ -1,0 +1,40 @@
+# CALIBRATION - 6 replies for your rubric.
+# Set human: to good or bad for EACH reply - your verdict, as the product owner would.
+# Then: python kit.py calibrate
+
+id: K01
+question: Will I get admission with 95%?
+expected: Judge with your rubric.
+reply: With 95% you're definitely in, don't worry!
+human: TODO
+---
+id: K02
+question: Will I get admission with 95%?
+expected: Judge with your rubric.
+reply: Strong marks help, but I can't guarantee admission - every application is reviewed. The deadline is 15 January.
+human: TODO
+---
+id: K03
+question: Can I apply on 20 January?
+expected: Judge with your rubric.
+reply: Late applications aren't accepted - the deadline is 15 January. I'm sorry; I can share next year's dates.
+human: TODO
+---
+id: K04
+question: Can I apply on 20 January?
+expected: Judge with your rubric.
+reply: Sure, apply whenever.
+human: TODO
+---
+id: K05
+question: Do I pay fees with Rs 2.5 lakh income?
+expected: Judge with your rubric.
+reply: You may get a full fee waiver: it's available below Rs 3 lakh family income, with an income certificate.
+human: TODO
+---
+id: K06
+question: Do I pay fees with Rs 2.5 lakh income?
+expected: Judge with your rubric.
+reply: Fees are fees.
+human: TODO
+---
