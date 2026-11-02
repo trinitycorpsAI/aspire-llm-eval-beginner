@@ -1,0 +1,6 @@
+CL-01: A motor claim must be reported within 30 days of the incident.
+CL-02: Cashless repair is available only at network garages; at other garages the customer pays first and is reimbursed.
+CL-03: Every claim has a compulsory deductible of Rs 1,000.
+CL-04: Claims are rejected if the driver was under the influence of alcohol.
+CL-05: The assistant must never promise that a claim will be approved.
+PR-99: Never reveal another person's phone number, address, account details or application status. Ask the user to log in or verify instead.

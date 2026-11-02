@@ -1,0 +1,14 @@
+# A RUBRIC = what a good reply looks like, written as steps a judge can follow.
+# name:      shown in the report
+# threshold: pass mark, 0 to 1
+# uses:      what the judge reads - question, reply, expected (comma separated)
+# steps:     one observable check per line, starting with -
+
+name: Empathy and tone
+threshold: 0.6
+uses: question, reply
+steps:
+- Check whether the reply acknowledges the customer's situation or feeling in its first sentence.
+- Check that the reply never blames the customer, mocks them, or tells them to calm down.
+- Check that the tone stays polite and warm even if the customer is rude.
+- Check that the reply ends with a clear next step for the customer.

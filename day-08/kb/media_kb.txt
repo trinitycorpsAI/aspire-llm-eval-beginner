@@ -1,0 +1,31 @@
+# KNOWLEDGE BASE - one document per block, starting with ## ID | title
+
+## KB-01 | Health claims
+Ads must never say a product cures, prevents or treats a medical condition. Allowed: 'helps reduce dust and pollen indoors' for air purifiers.
+
+## KB-02 | Discounts
+Discounts must match the brief exactly and every discount ad must include 'T&Cs apply'.
+
+## KB-03 | Competitors
+Ads must not mention competitor brands or compare prices with them by name.
+
+## KB-04 | Length
+Headlines must be 90 characters or fewer; body copy 200 characters or fewer.
+
+## KB-05 | Air purifier facts
+Our air purifiers have a HEPA H13 filter that captures 99.97% of particles of 0.3 microns. Filter replacement every 12 months.
+
+## KB-06 | Smart TV facts
+Our 55-inch smart TV has 4K resolution, Dolby Vision and a 2-year warranty.
+
+## KB-07 | Languages
+Ads may be written in English, Hindi, Tamil or Punjabi; regional ads use the same rules.
+
+## KB-08 | Superlatives
+Words like 'best' or 'No. 1' need a cited source in the brief; otherwise do not use them.
+
+## KB-90 | Brand guidelines (ARCHIVED 2023)
+ARCHIVED: 'T&Cs apply' optional for discounts under 20%. Replaced in 2025.
+
+## KB-91 | Blog: Diwali gift ideas
+Light up Diwali with smart gadgets for the whole family!

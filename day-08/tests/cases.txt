@@ -1,0 +1,62 @@
+# ================================================================
+#  DAY 8 RAG CASES for Lane
+#  version: 1.0
+#  labelled_by: Harbour & Lane customer team
+#  New line today:  reference:  the ideal answer, written from the RIGHT document.
+#  Context precision, context recall and answer correctness all compare against it.
+# ================================================================
+
+id: R01
+tag: policy
+question: What's the warranty on the Brera espresso machine?
+expected: States the 2-year manufacturer warranty from delivery and what it covers.
+reference: Brera espresso machines have a 2-year manufacturer warranty from the delivery date, covering manufacturing faults but not accidental damage or limescale.
+must_contain: 2-year, 2 year
+---
+id: R02
+tag: policy
+question: Can I return an unused toaster I got 20 days ago? Do I pay the postage?
+expected: Yes, within 30 days for unused items in original packaging, with a prepaid label. Must not use the archived 14-day policy.
+reference: Yes. Change-of-mind returns are accepted within 30 days of delivery for unused items in original packaging, and we email a prepaid returns label, so you don't pay postage.
+must_not_contain: 14 days, you pay the postage
+---
+id: R03
+tag: policy
+question: Do you price match Argos?
+expected: Says Harbour & Lane does not price match, and mentions the newsletter for sales.
+reference: No, Harbour & Lane does not offer price matching with other retailers. You can sign up to the newsletter to hear about sales.
+must_not_contain: we will match, we match
+---
+id: R04
+tag: policy
+question: How do I descale my Brera coffee machine? Can I use vinegar?
+expected: Gives the descaling steps with Brera descaler and says not to use vinegar.
+reference: Descale every 2-3 months with water and Brera descaler: hold the two-cup button for 5 seconds to run the programme, then run two tanks of clean water. Never use vinegar, it damages the seals.
+must_not_contain: vinegar is fine, you can use vinegar
+---
+id: R05
+tag: policy
+question: Do you deliver to Dublin and how much does it cost?
+expected: Yes, Ireland delivery in 5-7 working days for £9.95.
+reference: Yes, we deliver to Ireland in 5-7 working days for £9.95.
+must_contain: 9.95
+---
+id: R06
+tag: policy
+question: I'm moving to New York. Will my Brera kettle work there?
+expected: Says Brera products are built for UK 230V with UK plugs and are not suitable for the USA; using them there voids the warranty.
+reference: No. Brera electrical products are built for UK mains (230V) with UK plugs and are not suitable for 110-120V countries like the USA; using them there may be unsafe and voids the warranty.
+---
+id: R07
+tag: policy
+question: I ordered a mixer 2 hours ago by mistake. Can I cancel?
+expected: Explains cancellation is only possible within 1 hour of ordering; after that, return it after delivery.
+reference: Orders can only be cancelled within 1 hour of ordering. Yours is already being packed, so you can return it after delivery under the 30-day returns policy.
+---
+id: R08
+tag: out-of-scope
+question: Is there a student discount?
+expected: Says there are no student discounts or support discount codes; promotions come via the newsletter.
+reference: No, Harbour & Lane doesn't offer student discounts or discount codes through support. Promotions are announced in the newsletter and apply automatically at checkout.
+must_not_contain: 10% student, student code
+---

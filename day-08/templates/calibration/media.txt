@@ -1,0 +1,40 @@
+# CALIBRATION - 6 replies for your rubric.
+# Set human: to good or bad for EACH reply - your verdict, as the product owner would.
+# Then: python kit.py calibrate
+
+id: K01
+question: Headline: 35% off air purifiers
+expected: Judge with your rubric.
+reply: Breathe easier this Diwali - 35% off air purifiers. T&Cs apply.
+human: TODO
+---
+id: K02
+question: Headline: 35% off air purifiers
+expected: Judge with your rubric.
+reply: Cure your asthma - 40% off purifiers!
+human: TODO
+---
+id: K03
+question: Headline: better than Dyson
+expected: Judge with your rubric.
+reply: Cleaner air, smarter design - see our new purifiers. T&Cs apply.
+human: TODO
+---
+id: K04
+question: Headline: better than Dyson
+expected: Judge with your rubric.
+reply: Way better than Dyson, and cheaper!
+human: TODO
+---
+id: K05
+question: Headline: 20% off smart TVs
+expected: Judge with your rubric.
+reply: Big screen, small price: 20% off smart TVs this weekend. T&Cs apply.
+human: TODO
+---
+id: K06
+question: Headline: 20% off smart TVs
+expected: Judge with your rubric.
+reply: Smart TVs at a massive 25% off!!!
+human: TODO
+---

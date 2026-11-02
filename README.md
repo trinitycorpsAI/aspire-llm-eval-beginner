@@ -15,9 +15,13 @@ whether it is safe to release. Every day adds one more kind of evidence.
 | 5 | Hallucination, toxicity, bias, PII | `day-05` |
 | 6 | LLM-as-a-judge, G-Eval | `day-06` |
 | 7 | Building eval datasets | `day-07` |
-| 8 | Evaluating RAG outputs | coming |
+| 8 | Evaluating RAG outputs | `day-08` |
 | 9 | Prompt injection, bias, EU AI Act, India AI guidance | coming |
 | 10 | Capstone | coming |
+
+## Day 8
+
+- `day-08/` - Eval Kit v5: knowledge bases, retrieval, context precision/recall, answer correctness. `python kit.py import` brings your Day 7 project. Start with `day-08/README.md`.
 
 ## Day 7
 

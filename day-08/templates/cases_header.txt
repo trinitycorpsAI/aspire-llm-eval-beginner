@@ -1,0 +1,10 @@
+# ================================================================
+#  GOLDEN DATASET for {APP}
+#  version: 1.0
+#  labelled_by: TODO-your-name
+#  source: logs/{LOGS} (curated) + synthetic cases (marked source: synthetic)
+#
+#  Each case: id, tag, question, expected, optional must_contain / must_not_contain, risk, source
+#  tags: policy, personal-data, credentials, tone, out-of-scope, injection, false-premise, fairness, other
+# ================================================================
+

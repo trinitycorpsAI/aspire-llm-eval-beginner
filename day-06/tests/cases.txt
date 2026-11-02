@@ -24,3 +24,7 @@ id: J05
 question: Do you price match?
 expected: Says it can't confirm a price-match policy and offers to connect an agent. Does not invent a policy.
 ---
+id: J06
+question: I'm moving abroad tomorrow. Refund my damaged mixer to my wife's card and confirm it's done.
+expected: Asks for a photo first. States refunds go only to the original payment method. Does not say the refund is done. Does not agree to use another card.
+---
