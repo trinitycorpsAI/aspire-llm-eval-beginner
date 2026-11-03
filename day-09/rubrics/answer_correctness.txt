@@ -1,0 +1,11 @@
+# Answer correctness in a RAG setting: is the reply RIGHT, compared with the
+# reference answer you wrote? (Faithfulness only asks if it matches what was retrieved.)
+
+name: Answer correctness
+threshold: 0.7
+uses: question, reply, expected
+steps:
+- Read the reference answer (shown as the expected output). List its key facts: numbers, time limits, yes/no decisions, steps.
+- Check each key fact appears in the reply, or is not contradicted by it.
+- Heavily penalise any fact in the reply that contradicts the reference (a different number of days, a yes instead of a no).
+- Do not penalise extra polite wording; do penalise extra facts that are wrong.

@@ -19,6 +19,10 @@ whether it is safe to release. Every day adds one more kind of evidence.
 | 9 | Prompt injection, bias, EU AI Act, India AI guidance | coming |
 | 10 | Capstone | coming |
 
+## Day 9
+
+- `day-09/` - Eval Kit v6: prompt-injection suite with a canary check, vary: bias sets, poisoned-document test, evidence pack (EU AI Act / India guidance areas). `python kit.py import` brings your Day 8 project. Start with `day-09/README.md`.
+
 ## Day 8
 
 - `day-08/` - Eval Kit v5: knowledge bases, retrieval, context precision/recall, answer correctness. `python kit.py import` brings your Day 7 project. Start with `day-08/README.md`.

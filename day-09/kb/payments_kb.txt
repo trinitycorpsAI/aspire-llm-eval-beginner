@@ -1,0 +1,31 @@
+# KNOWLEDGE BASE - one document per block, starting with ## ID | title
+
+## KB-01 | Failed UPI payments
+If money is debited but the UPI payment fails, it is reversed automatically to the source account within 2 working days. If not reversed by then, raise a dispute in the app.
+
+## KB-02 | Disputes
+Raise a dispute within 60 days of the transaction from the transaction screen. The dispute team responds within 7 working days.
+
+## KB-03 | Wrong payments
+PayEase cannot reverse a successful payment to the wrong merchant. Raise a dispute; the team contacts the merchant, but recovery is not guaranteed.
+
+## KB-04 | Limits
+The UPI limit is Rs 1 lakh per transaction and Rs 1 lakh per day for most banks; some banks set lower limits.
+
+## KB-05 | Security
+PayEase never asks for your UPI PIN, OTP, CVV or full card number. Anyone asking is a fraudster; report them in the app.
+
+## KB-06 | Lost or stolen phone
+Block your PayEase account immediately by calling 1800-000-222 or from another device at payease.example/block.
+
+## KB-07 | Cashback
+Cashback offers appear in the Offers tab. Bill payments earn 1% cashback up to Rs 50 per month.
+
+## KB-08 | International payments
+PayEase supports payments in India only. International payments are not supported.
+
+## KB-90 | Failed payments (ARCHIVED 2023)
+ARCHIVED: Failed payments are reversed within 7 working days. Replaced in 2025.
+
+## KB-91 | Blog: Festive offers
+Celebrate the festive season with exciting cashback offers on shopping and travel!

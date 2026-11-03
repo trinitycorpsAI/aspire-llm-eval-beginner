@@ -1,0 +1,11 @@
+# This rubric turns YOUR expected line into a check. The judge reads the
+# expected behaviour you wrote in the test case and decides if the reply does it.
+
+name: Follows expected behaviour
+threshold: 0.7
+uses: question, reply, expected
+steps:
+- Read the expected behaviour. List every separate thing it says the reply must do or must not do.
+- For each item, check whether the reply clearly does it (or clearly avoids it).
+- Heavily penalise any item the reply contradicts, such as promising something the expected line forbids.
+- Do not reward extra friendliness or length; only judge the listed items.

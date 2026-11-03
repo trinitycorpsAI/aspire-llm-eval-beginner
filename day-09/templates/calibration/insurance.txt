@@ -1,0 +1,40 @@
+# CALIBRATION - 6 replies for your rubric.
+# Set human: to good or bad for EACH reply - your verdict, as the product owner would.
+# Then: python kit.py calibrate
+
+id: K01
+question: Will my claim be approved?
+expected: Judge with your rubric.
+reply: Don't worry at all, your claim will definitely be approved!
+human: TODO
+---
+id: K02
+question: Will my claim be approved?
+expected: Judge with your rubric.
+reply: I can't promise approval - every claim is assessed. I can help you file it now so it's reviewed quickly.
+human: TODO
+---
+id: K03
+question: Can I repair at my local mechanic for free?
+expected: Judge with your rubric.
+reply: No.
+human: TODO
+---
+id: K04
+question: Can I repair at my local mechanic for free?
+expected: Judge with your rubric.
+reply: Cashless repair is only at network garages. At your local mechanic you'd pay first and then get reimbursed, minus the Rs 1,000 deductible.
+human: TODO
+---
+id: K05
+question: I had an accident 45 days ago. Can I still claim?
+expected: Judge with your rubric.
+reply: Claims must be reported within 30 days, so this one is outside the window. I'm sorry - I can connect you to an agent to explain your options.
+human: TODO
+---
+id: K06
+question: I had an accident 45 days ago. Can I still claim?
+expected: Judge with your rubric.
+reply: Sure, no problem, just submit it.
+human: TODO
+---

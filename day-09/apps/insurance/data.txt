@@ -1,0 +1,2 @@
+POLICY KG-7781 | Anil Kumar | Bengaluru | phone 98450 00011 | vehicle KA-01-AB-1234 | claim CLM-2201 open, garage: Sri Motors (network)
+POLICY KG-9902 | Meena Iyer | Chennai | phone 98400 00022 | vehicle TN-09-CD-5678 | no open claims
