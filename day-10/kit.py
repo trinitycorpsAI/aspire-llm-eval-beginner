@@ -1066,6 +1066,9 @@ def cmd_report() -> None:
     evid = _re.search(r"^Evidence:\s*(.+)$", v, _re.M)
     defects = _re.findall(r"^\s*\d\.\s*(Case:.+)$", v, _re.M)
     nextm = _re.search(r"^Next measurement:\s*(.+)$", v, _re.M)
+    hint = r"\s{2,}\(.*\)$"   # strip the template's '(...)' hint from the end of a line
+    evid_text = _re.sub(hint, "", evid.group(1)).strip() if evid else "TODO"
+    next_text = _re.sub(hint, "", nextm.group(1)).strip() if nextm else "TODO"
     cal = HERE / "reports" / "calibration.json"
     calt = json.loads(cal.read_text(encoding="utf-8")) if cal.exists() else None
     rows = _metrics_rows(proj)
@@ -1081,7 +1084,7 @@ def cmd_report() -> None:
         by.setdefault(t, [0, 0]); by[t][0] += 1; by[t][1] += c.get("verdict") == "PASS"
     L = [f"# Capstone findings - {cfg.get('app', 'name')}", "",
          f"_{datetime.now():%d %b %Y} · {total} test cases · judge `{cfg.get('models', 'judge_model', fallback='?')}`_", "",
-         "## 1 · Decision", "", f"**{dec.group(1) if dec else 'TODO'}**: {_re.sub(r'\s{2,}\(.*\)$', '', evid.group(1)).strip() if evid else 'TODO'}", "",
+         "## 1 · Decision", "", f"**{dec.group(1) if dec else 'TODO'}**: {evid_text}", "",
          f"Gate: **{last.get('gate', 'n/a')}** · pass rate **{passed}/{total}** ({(100 * passed // total) if total else 0}%)"
          + (f" · calibration **{calt['agree']}/{calt['total']}**" if calt else ""), "",
          "## 2 · The five metrics", "", "| Metric | Covers risk | Pass mark | Checked | Passed | Avg score | Why |", "|---|---|---|---|---|---|---|"]
@@ -1103,7 +1106,7 @@ def cmd_report() -> None:
         L.append(f"- **{c['id']}** [{c.get('tag', '')}] {c['question'][:70]} - {'; '.join(why)[:140]}")
     gaps = [t for t, _, _ in MAP if by.get(t, [0])[0] == 0]
     L += ["", "## 6 · Gaps and next steps", "", ("- Not yet tested: " + ", ".join(gaps)) if gaps else "- Every mapped risk area has tests.",
-          f"- Next measurement: {_re.sub(r'\s{2,}\(.*\)$', '', nextm.group(1)).strip() if nextm else 'TODO'}", "",
+          f"- Next measurement: {next_text}", "",
           "---", "_Present in 3 minutes: decision (30s) → 5 metrics and why (60s) → top defects with evidence (60s) → gaps and next step (30s)._"]
     out = proj / "findings.md"
     out.write_text("\n".join(L) + "\n", encoding="utf-8")
