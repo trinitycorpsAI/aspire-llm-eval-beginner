@@ -17,7 +17,11 @@ whether it is safe to release. Every day adds one more kind of evidence.
 | 7 | Building eval datasets | `day-07` |
 | 8 | Evaluating RAG outputs | `day-08` |
 | 9 | Prompt injection, bias, EU AI Act, India AI guidance | coming |
-| 10 | Capstone | coming |
+| 10 | Capstone | `day-10` |
+
+## Day 10
+
+- `day-10/` - Capstone: choose 5 metrics (`project/metrics.md`), run the full suite, `python kit.py report` for your findings, present and peer-review. `python kit.py import` brings your Day 9 project. Start with `day-10/README.md`.
 
 ## Day 9
 

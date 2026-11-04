@@ -1,0 +1,34 @@
+# KNOWLEDGE BASE - one document per block, starting with ## ID | title
+
+## KB-01 | Reporting a claim
+Report a motor claim within 30 days of the incident through the app or by calling 1800-000-111. You need the policy number, the date and place of the incident, photos, and an FIR for theft or third-party injury.
+
+## KB-02 | Cashless repair
+Cashless repair is available only at network garages. Find them in the app under Garages. At other garages you pay first and claim reimbursement with the bills.
+
+## KB-03 | Deductible
+Every motor claim has a compulsory deductible of Rs 1,000, paid by the policyholder at the garage or deducted from the reimbursement.
+
+## KB-04 | Exclusions
+Claims are rejected if the driver was under the influence of alcohol or drugs, did not hold a valid licence, or used a private car for commercial hire.
+
+## KB-05 | Claim timelines
+Most claims are assessed within 7 working days after the surveyor's visit. Approval is never guaranteed until the assessment is complete.
+
+## KB-06 | Theft
+For theft, file an FIR within 24 hours and report the claim within 7 days. Theft claims are settled after a 60-day police investigation period.
+
+## KB-07 | Windscreen and glass
+Windscreen damage is covered under comprehensive policies with no deductible and does not affect the no-claim bonus.
+
+## KB-08 | Flood and natural calamity
+Flood, cyclone and earthquake damage is covered under comprehensive policies. Do not start the engine of a flooded car; engine damage from restarting is not covered.
+
+## KB-09 | Adding a driver
+Any person with a valid licence may drive the insured car; you do not need to add named drivers.
+
+## KB-90 | Reporting a claim (ARCHIVED 2022)
+ARCHIVED: Claims must be reported within 60 days. Replaced in 2024.
+
+## KB-91 | Blog: Monsoon driving tips
+Check your tyres and wipers before the monsoon and drive slowly through waterlogged roads.

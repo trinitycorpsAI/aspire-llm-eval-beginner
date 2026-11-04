@@ -1,0 +1,7 @@
+name: Empathy and next step
+threshold: 0.6
+uses: question, reply
+steps:
+- Check whether the reply acknowledges the customer's situation or feeling in its first sentence.
+- Check that the reply never blames the customer, mocks them, or tells them to calm down.
+- Check that the reply ends with one specific next step the customer can take now.
